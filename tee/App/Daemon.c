@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -17,6 +19,9 @@
 #define TEE_REQUEST_FILE "/sys/kernel/security/abac/tee_request"
 #define TEE_RESPONSE_FILE "/sys/kernel/security/abac/tee_response"
 #define TEE_RULES_FILE "/etc/abac/tee_rules.conf"
+#define TEE_STATE_DIRECTORY "/var/lib/abac-tee"
+#define TEE_SEALED_STATE_FILE "/var/lib/abac-tee/state.sealed"
+#define TEE_SEALED_TEMP_FILE "/var/lib/abac-tee/state.sealed.tmp"
 #define TEE_ENV_FILE "/etc/abac/tee_env.conf"
 
 static void set_attribute(abac_tee_rule_data_t *rule, uint32_t index,
@@ -255,6 +260,214 @@ static int load_rules_from_file(sgx_enclave_id_t enclave_id,
         return loaded;
 }
 
+static int read_complete(int fd, uint8_t *buffer, size_t size)
+{
+        size_t total = 0;
+
+        while (total < size) {
+                ssize_t bytes = read(fd, buffer + total, size - total);
+
+                if (bytes < 0) {
+                        if (errno == EINTR)
+                                continue;
+                        return -1;
+                }
+                if (bytes == 0)
+                        return -1;
+
+                total += (size_t)bytes;
+        }
+
+        return 0;
+}
+
+static int write_complete(int fd, const uint8_t *buffer, size_t size)
+{
+        size_t total = 0;
+
+        while (total < size) {
+                ssize_t bytes = write(fd, buffer + total, size - total);
+
+                if (bytes < 0) {
+                        if (errno == EINTR)
+                                continue;
+                        return -1;
+                }
+                if (bytes == 0)
+                        return -1;
+
+                total += (size_t)bytes;
+        }
+
+        return 0;
+}
+
+static int save_sealed_state(sgx_enclave_id_t enclave_id)
+{
+        int enclave_status = ABAC_TEE_INVALID_REQUEST;
+        uint32_t sealed_size = 0;
+        uint8_t *sealed_data = NULL;
+        sgx_status_t status;
+        int fd = -1;
+        int result = -1;
+
+        status = ecall_get_sealed_state_size(
+                enclave_id, &enclave_status, &sealed_size);
+        if (status != SGX_SUCCESS ||
+            enclave_status != ABAC_TEE_SUCCESS ||
+            sealed_size == 0) {
+                fprintf(stderr,
+                        "Get sealed-state size failed: SGX=0x%x enclave=%d\n",
+                        status, enclave_status);
+                return -1;
+        }
+
+        sealed_data = malloc(sealed_size);
+        if (!sealed_data)
+                return -1;
+
+        status = ecall_seal_state(
+                enclave_id, &enclave_status,
+                sealed_data, sealed_size);
+        if (status != SGX_SUCCESS ||
+            enclave_status != ABAC_TEE_SUCCESS) {
+                fprintf(stderr,
+                        "Seal state failed: SGX=0x%x enclave=%d\n",
+                        status, enclave_status);
+                goto out;
+        }
+
+        if (mkdir(TEE_STATE_DIRECTORY, 0700) != 0 &&
+            errno != EEXIST) {
+                perror("create TEE state directory");
+                goto out;
+        }
+
+        fd = open(TEE_SEALED_TEMP_FILE,
+                  O_WRONLY | O_CREAT | O_TRUNC, 0600);
+        if (fd < 0) {
+                perror("open temporary sealed state");
+                goto out;
+        }
+
+        if (write_complete(fd, sealed_data, sealed_size) != 0) {
+                perror("write sealed state");
+                goto out;
+        }
+
+        if (fsync(fd) != 0) {
+                perror("fsync sealed state");
+                goto out;
+        }
+
+        if (close(fd) != 0) {
+                fd = -1;
+                perror("close sealed state");
+                goto out;
+        }
+        fd = -1;
+
+        if (rename(TEE_SEALED_TEMP_FILE,
+                   TEE_SEALED_STATE_FILE) != 0) {
+                perror("install sealed state");
+                goto out;
+        }
+
+        printf("TEE state sealed to %s (%u bytes)\n",
+               TEE_SEALED_STATE_FILE, sealed_size);
+        result = 0;
+
+out:
+        if (fd >= 0)
+                close(fd);
+        if (result != 0)
+                unlink(TEE_SEALED_TEMP_FILE);
+        if (sealed_data) {
+                memset(sealed_data, 0, sealed_size);
+                free(sealed_data);
+        }
+
+        return result;
+}
+
+/*
+ * Returns 1 when restored, 0 when no state exists yet,
+ * and -1 when an existing state cannot be trusted.
+ */
+static int load_sealed_state(sgx_enclave_id_t enclave_id)
+{
+        int enclave_status = ABAC_TEE_INVALID_REQUEST;
+        uint32_t expected_size = 0;
+        uint8_t *sealed_data = NULL;
+        struct stat state_stat;
+        sgx_status_t status;
+        int fd;
+        int result = -1;
+
+        fd = open(TEE_SEALED_STATE_FILE, O_RDONLY);
+        if (fd < 0) {
+                if (errno == ENOENT)
+                        return 0;
+                perror("open sealed state");
+                return -1;
+        }
+
+        status = ecall_get_sealed_state_size(
+                enclave_id, &enclave_status, &expected_size);
+        if (status != SGX_SUCCESS ||
+            enclave_status != ABAC_TEE_SUCCESS ||
+            expected_size == 0) {
+                fprintf(stderr,
+                        "Get sealed-state size failed: SGX=0x%x enclave=%d\n",
+                        status, enclave_status);
+                goto out;
+        }
+
+        if (fstat(fd, &state_stat) != 0) {
+                perror("stat sealed state");
+                goto out;
+        }
+
+        if (state_stat.st_size != (off_t)expected_size) {
+                fprintf(stderr,
+                        "Invalid sealed-state size: expected=%u actual=%lld\n",
+                        expected_size, (long long)state_stat.st_size);
+                goto out;
+        }
+
+        sealed_data = malloc(expected_size);
+        if (!sealed_data)
+                goto out;
+
+        if (read_complete(fd, sealed_data, expected_size) != 0) {
+                fprintf(stderr, "Could not read complete sealed state\n");
+                goto out;
+        }
+
+        status = ecall_unseal_state(
+                enclave_id, &enclave_status,
+                sealed_data, expected_size);
+        if (status != SGX_SUCCESS ||
+            enclave_status != ABAC_TEE_SUCCESS) {
+                fprintf(stderr,
+                        "Unseal state failed: SGX=0x%x enclave=%d\n",
+                        status, enclave_status);
+                goto out;
+        }
+
+        printf("TEE state restored from %s\n",
+               TEE_SEALED_STATE_FILE);
+        result = 1;
+
+out:
+        close(fd);
+        if (sealed_data) {
+                memset(sealed_data, 0, expected_size);
+                free(sealed_data);
+        }
+        return result;
+}
+
 int main(void)
 {
         sgx_launch_token_t launch_token = { 0 };
@@ -263,7 +476,8 @@ int main(void)
         int launch_token_updated = 0;
         int request_fd;
         int response_fd;
-        int loaded_rules;
+        int loaded_rules = 0;
+        int restored_state;
         sgx_status_t status;
 
         status = sgx_create_enclave(ENCLAVE_FILE, SGX_DEBUG_FLAG,
@@ -274,15 +488,30 @@ int main(void)
                 return 1;
         }
 
-        if (load_environment_config(enclave_id, TEE_ENV_FILE) != 0) {
+        restored_state = load_sealed_state(enclave_id);
+        if (restored_state < 0) {
+                /*
+                 * A blob exists but cannot be authenticated or validated.
+                 * Do not silently trust the plaintext configuration.
+                 */
                 sgx_destroy_enclave(enclave_id);
                 return 1;
         }
 
-        loaded_rules = load_rules_from_file(enclave_id, TEE_RULES_FILE);
-        if (loaded_rules < 0) {
-                sgx_destroy_enclave(enclave_id);
-                return 1;
+        if (restored_state == 0) {
+                if (load_environment_config(
+                            enclave_id, TEE_ENV_FILE) != 0) {
+                        sgx_destroy_enclave(enclave_id);
+                        return 1;
+                }
+
+                loaded_rules = load_rules_from_file(
+                        enclave_id, TEE_RULES_FILE);
+                if (loaded_rules < 0 ||
+                    save_sealed_state(enclave_id) != 0) {
+                        sgx_destroy_enclave(enclave_id);
+                        return 1;
+                }
         }
 
         request_fd = open(TEE_REQUEST_FILE, O_RDONLY);
@@ -300,8 +529,11 @@ int main(void)
                 return 1;
         }
 
-        printf("ABAC TEE daemon ready; %d rule(s) loaded\n",
-               loaded_rules);
+        if (restored_state == 1)
+                printf("ABAC TEE daemon ready; sealed state restored\n");
+        else
+                printf("ABAC TEE daemon ready; %d rule(s) loaded and sealed\n",
+                       loaded_rules);
         fflush(stdout);
 
         for (;;) {

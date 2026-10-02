@@ -5,13 +5,33 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <sgx_tseal.h>
+
 #define ABAC_TEE_MAX_RULES 64
+#define ABAC_TEE_STATE_MAGIC 0x41424143U
+#define ABAC_TEE_STATE_VERSION 1U
 
-static abac_tee_rule_data_t trusted_rules[ABAC_TEE_MAX_RULES];
-static uint8_t trusted_rule_used[ABAC_TEE_MAX_RULES];
+typedef struct {
+        uint32_t magic;
+        uint32_t version;
+        abac_tee_rule_data_t rules[ABAC_TEE_MAX_RULES];
+        uint8_t rule_used[ABAC_TEE_MAX_RULES];
+        abac_tee_env_config_t env_config;
+        uint8_t env_configured;
+} abac_tee_persistent_state_t;
 
-static abac_tee_env_config_t trusted_env_config;
-static uint8_t trusted_env_configured;
+static abac_tee_persistent_state_t trusted_state = {
+        .magic = ABAC_TEE_STATE_MAGIC,
+        .version = ABAC_TEE_STATE_VERSION
+};
+
+/* Temporary enclave memory used while validating an unsealed state. */
+static abac_tee_persistent_state_t recovered_state;
+
+#define trusted_rules          (trusted_state.rules)
+#define trusted_rule_used      (trusted_state.rule_used)
+#define trusted_env_config     (trusted_state.env_config)
+#define trusted_env_configured (trusted_state.env_configured)
 
 static int has_terminator(const char *value, size_t size)
 {
@@ -238,6 +258,114 @@ int ecall_evaluate_rule(const uint8_t *request_data,
         }
 
         *matched = 1;
+        return ABAC_TEE_SUCCESS;
+}
+
+static int valid_persistent_state(
+        const abac_tee_persistent_state_t *state)
+{
+        uint32_t i;
+
+        if (!state ||
+            state->magic != ABAC_TEE_STATE_MAGIC ||
+            state->version != ABAC_TEE_STATE_VERSION)
+                return 0;
+
+        if (!state->env_configured ||
+            state->env_config.workday_mask == 0 ||
+            (state->env_config.workday_mask & ~0x7fU) != 0 ||
+            state->env_config.work_start_minute >= 1440 ||
+            state->env_config.work_end_minute >= 1440 ||
+            state->env_config.work_start_minute ==
+                    state->env_config.work_end_minute)
+                return 0;
+
+        for (i = 0; i < ABAC_TEE_MAX_RULES; i++) {
+                if (state->rule_used[i] &&
+                    !valid_rule_data(&state->rules[i]))
+                        return 0;
+        }
+
+        return 1;
+}
+
+int ecall_get_sealed_state_size(uint32_t *sealed_size)
+{
+        uint32_t size;
+
+        if (!sealed_size)
+                return ABAC_TEE_INVALID_REQUEST;
+
+        size = sgx_calc_sealed_data_size(
+                0, (uint32_t)sizeof(trusted_state));
+        if (size == UINT32_MAX)
+                return ABAC_TEE_SEAL_FAILED;
+
+        *sealed_size = size;
+        return ABAC_TEE_SUCCESS;
+}
+
+int ecall_seal_state(uint8_t *sealed_data, uint32_t sealed_size)
+{
+        uint32_t expected_size;
+        sgx_status_t status;
+
+        if (!sealed_data || !valid_persistent_state(&trusted_state))
+                return ABAC_TEE_STATE_INVALID;
+
+        expected_size = sgx_calc_sealed_data_size(
+                0, (uint32_t)sizeof(trusted_state));
+        if (expected_size == UINT32_MAX ||
+            sealed_size != expected_size)
+                return ABAC_TEE_INVALID_REQUEST;
+
+        status = sgx_seal_data(
+                0, NULL,
+                (uint32_t)sizeof(trusted_state),
+                (const uint8_t *)&trusted_state,
+                sealed_size,
+                (sgx_sealed_data_t *)sealed_data);
+
+        return status == SGX_SUCCESS ?
+                ABAC_TEE_SUCCESS : ABAC_TEE_SEAL_FAILED;
+}
+
+int ecall_unseal_state(const uint8_t *sealed_data, uint32_t sealed_size)
+{
+        uint32_t encrypted_size;
+        uint32_t plaintext_size;
+        uint32_t additional_size = 0;
+        sgx_status_t status;
+
+        if (!sealed_data ||
+            sealed_size < sizeof(sgx_sealed_data_t))
+                return ABAC_TEE_INVALID_REQUEST;
+
+        encrypted_size = sgx_get_encrypt_txt_len(
+                (const sgx_sealed_data_t *)sealed_data);
+        if (encrypted_size != sizeof(recovered_state))
+                return ABAC_TEE_STATE_INVALID;
+
+        plaintext_size = (uint32_t)sizeof(recovered_state);
+        memset(&recovered_state, 0, sizeof(recovered_state));
+
+        status = sgx_unseal_data(
+                (const sgx_sealed_data_t *)sealed_data,
+                NULL, &additional_size,
+                (uint8_t *)&recovered_state,
+                &plaintext_size);
+
+        if (status != SGX_SUCCESS)
+                return ABAC_TEE_UNSEAL_FAILED;
+
+        if (plaintext_size != sizeof(recovered_state) ||
+            !valid_persistent_state(&recovered_state))
+                return ABAC_TEE_STATE_INVALID;
+
+        memcpy(&trusted_state, &recovered_state,
+               sizeof(trusted_state));
+        memset(&recovered_state, 0, sizeof(recovered_state));
+
         return ABAC_TEE_SUCCESS;
 }
 

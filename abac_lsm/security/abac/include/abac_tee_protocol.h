@@ -31,7 +31,10 @@ enum abac_tee_status {
         ABAC_TEE_INVALID_REQUEST = -1,
         ABAC_TEE_RULE_NOT_FOUND = -2,
         ABAC_TEE_RULE_LIMIT_REACHED = -3,
-        ABAC_TEE_SERVICE_UNAVAILABLE = -4
+        ABAC_TEE_SERVICE_UNAVAILABLE = -4,
+        ABAC_TEE_SEAL_FAILED = -5,
+        ABAC_TEE_UNSEAL_FAILED = -6,
+        ABAC_TEE_STATE_INVALID = -7
 };
 
 typedef struct {
