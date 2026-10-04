@@ -23,6 +23,14 @@ KERN_ENV_ATTRS_FILE = "env_attr"
 KERN_POLICY_FILE = "policy"
 KERN_INCLUDE_PATHS_FILE = "include_paths"
 KERN_EXCLUDE_PATHS_FILE = "exclude_paths"
+KERN_TEE_POLICY_FILE = "tee_policy"
+
+TEE_UPDATE_MARKER = "/var/lib/abac-tee/update.pending"
+TEE_SERVICE = "abac-tee.service"
+KERN_TEE_POLICY_FILE = "tee_policy"
+
+TEE_UPDATE_MARKER = "/var/lib/abac-tee/update.pending"
+TEE_SERVICE = "abac-tee.service"
 
 SHARED_DIR = "/home/secured/"
 

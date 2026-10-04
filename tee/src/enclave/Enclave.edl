@@ -24,6 +24,16 @@ enclave {
                         [in, size=sealed_size] const uint8_t *sealed_data,
                         uint32_t sealed_size);
 
+                public int ecall_begin_policy_update(
+                        uint64_t new_generation);
+
+                public int ecall_commit_policy_update();
+
+                public int ecall_abort_policy_update();
+
+                public int ecall_get_policy_generation(
+                        [out] uint64_t *generation);
+
                 public int ecall_clear_rules();
         };
 };

@@ -30,6 +30,7 @@ struct dentry *mode_file;
 struct dentry *tee_mode_file;
 struct dentry *tee_request_file;
 struct dentry *tee_response_file;
+struct dentry *tee_policy_file;
 struct dentry *hashmap_file;
 struct dentry *include_paths_file;
 struct dentry *exclude_paths_file;
@@ -563,6 +564,8 @@ static void destroy_abac_fs(void)
         if (tee_mode_file) {
                 securityfs_remove(tee_mode_file);
         }
+        if (tee_policy_file)
+                securityfs_remove(tee_policy_file);
         if (tee_response_file)
                 securityfs_remove(tee_response_file);
         if (tee_request_file)
@@ -715,6 +718,17 @@ static int __init abac_create_fs(void)
 
         printk(KERN_INFO
                "ABAC LSM: Created TEE request/response files");
+
+        tee_policy_file = securityfs_create_file("tee_policy", 0600, abacfs, NULL,
+                                                  &abac_tee_policy_fops);
+        if (IS_ERR(tee_policy_file)) {
+                tee_policy_file = NULL;
+                destroy_abac_fs();
+                return -ENOMEM;
+        }
+
+        printk(KERN_INFO
+               "ABAC LSM: Created file /sys/kernel/security/abac/tee_policy");
 
 	hashmap_file = securityfs_create_file("hashmap", 0600, abacfs, NULL,
 					      &hashmap_fops);

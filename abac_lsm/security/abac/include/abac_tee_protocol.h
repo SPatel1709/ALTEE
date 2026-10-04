@@ -34,7 +34,13 @@ enum abac_tee_status {
         ABAC_TEE_SERVICE_UNAVAILABLE = -4,
         ABAC_TEE_SEAL_FAILED = -5,
         ABAC_TEE_UNSEAL_FAILED = -6,
-        ABAC_TEE_STATE_INVALID = -7
+
+        // Adding new policy requires to have these states
+        // It is divied into add->stage->commit/abort type of logic.
+        ABAC_TEE_STATE_INVALID = -7,
+        ABAC_TEE_UPDATE_IN_PROGRESS = -8,
+        ABAC_TEE_NO_UPDATE = -9,
+        ABAC_TEE_GENERATION_INVALID = -10
 };
 
 typedef struct {
@@ -72,17 +78,20 @@ typedef struct {
  * candidate rule values collected by the kernel plus raw runtime context.
  */
 typedef struct {
+        abac_tee_u64 policy_generation;
         abac_tee_rule_data_t rule;
         abac_tee_env_context_t environment;
 } abac_tee_eval_data_t;
 
 typedef struct {
         abac_tee_u64 request_id;
+        abac_tee_u64 policy_generation;
         abac_tee_rule_data_t rule;
 } abac_tee_ipc_request_t;
 
 typedef struct {
         abac_tee_u64 request_id;
+        abac_tee_u64 policy_generation;
         abac_tee_s32 status;
         abac_tee_s32 matched;
 } abac_tee_ipc_response_t;

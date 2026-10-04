@@ -2,6 +2,10 @@
 # Copyright (C) 2021 Hariyala Omakara Naga Sai Varshith
 
 import os
+import subprocess
+import time
+import subprocess
+import time
 import sys
 import click
 import json
@@ -138,7 +142,7 @@ def serialize_policy_section(attributes, section_type,
     return ",".join(kernel_avps)
 
 
-def load_policy(tee_enabled=False):
+def load_policy(tee_enabled=False, write_kernel=True, write_tee=True):
     """Load kernel rules and generate the enclave-rule configuration."""
     config_path = CONFIG_ROOT + CONFIG_POLICY_FILE
     kernel_path = ABAC_MOUNT + KERN_POLICY_FILE
@@ -149,9 +153,10 @@ def load_policy(tee_enabled=False):
         rules = json.load(f)["rules"]
 
     if len(rules) == 0:
-        with open(tee_config_path, "w"):
-            pass
-        os.chmod(tee_config_path, 0o600)
+        if write_tee:
+            with open(tee_config_path, "w"):
+                pass
+            os.chmod(tee_config_path, 0o600)
         print("No rules found. Not writing anything...")
         return
 
@@ -180,16 +185,100 @@ def load_policy(tee_enabled=False):
         if tee_enabled and tee_attributes:
             tee_content += f"{rule_id}|{','.join(tee_attributes)}\n"
 
-    with open(kernel_path, "w") as f:
-        f.write(kernel_content)
+    if write_kernel:
+        with open(kernel_path, "w") as f:
+            f.write(kernel_content)
+        print("ABAC policy loaded into kernel")
 
-    with open(tee_config_path, "w") as f:
-        f.write(tee_content)
-    os.chmod(tee_config_path, 0o600)
+    if write_tee:
+        with open(tee_config_path, "w") as f:
+            f.write(tee_content)
+        os.chmod(tee_config_path, 0o600)
+        if tee_enabled:
+            print(f"TEE rules written to {tee_config_path}")
 
-    print("ABAC policy loaded into kernel")
-    if tee_enabled:
-        print(f"TEE rules written to {tee_config_path}")
+
+def read_tee_policy_state():
+    path = ABAC_MOUNT + KERN_TEE_POLICY_FILE
+    state = {}
+
+    with open(path) as f:
+        for line in f:
+            name, value = line.strip().split("=", 1)
+            state[name] = int(value)
+
+    return state
+
+
+def write_tee_policy_command(command, generation):
+    path = ABAC_MOUNT + KERN_TEE_POLICY_FILE
+
+    with open(path, "w") as f:
+        f.write(f"{command} {generation}\n")
+
+
+def wait_for_tee_update(timeout=15):
+    deadline = time.monotonic() + timeout
+    marker = Path(TEE_UPDATE_MARKER)
+
+    while time.monotonic() < deadline:
+        service_active = subprocess.run(
+            ["systemctl", "is-active", "--quiet", TEE_SERVICE]
+        ).returncode == 0
+
+        if service_active and not marker.exists():
+            return
+
+        time.sleep(0.1)
+
+    raise RuntimeError("TEE policy update timed out")
+
+
+def load_tee_policy_transaction():
+    state = read_tee_policy_state()
+
+    if state.get("updating"):
+        sys.exit("A TEE policy update is already in progress")
+
+    active_generation = state.get("generation", 0)
+    if active_generation == 0:
+        sys.exit("TEE generation is not synchronized. Restart abac-tee.service first")
+    if active_generation >= (1 << 64) - 1:
+        sys.exit("TEE policy generation limit reached")
+
+    new_generation = active_generation + 1
+    update_published = False
+
+    write_tee_policy_command("begin", new_generation)
+
+    try:
+        load_policy(True, write_kernel=False, write_tee=True)
+
+        marker = Path(TEE_UPDATE_MARKER)
+        marker.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        with open(marker, "w") as f:
+            f.write(f"{new_generation}\n")
+        os.chmod(marker, 0o600)
+        update_published = True
+
+        subprocess.run(["systemctl", "restart", TEE_SERVICE], check=True)
+        wait_for_tee_update()
+    except Exception as error:
+        if not update_published:
+            write_tee_policy_command("abort", new_generation)
+        sys.exit(f"TEE enclave update failed; access remains fail-closed: {error}")
+
+    try:
+        load_policy(True, write_kernel=True, write_tee=False)
+        load_user_attr()
+        load_obj_attr()
+        load_env_attr()
+        load_path_scope()
+        write_tee_policy_command("commit", new_generation)
+    except Exception as error:
+        sys.exit(f"Kernel policy update failed; access remains fail-closed: {error}")
+
+    print(f"TEE policy generation {new_generation} synchronized")
 
 
 @click.command()
@@ -206,8 +295,11 @@ def load(tee):
     if not p.is_dir():
         sys.exit(f"ABAC security file system is not mounted. Please check if the ABAC LSM is loaded")
 
-    load_policy(tee)
-    load_user_attr()
-    load_obj_attr()
-    load_env_attr()
-    load_path_scope()
+    if tee:
+        load_tee_policy_transaction()
+    else:
+        load_policy(False)
+        load_user_attr()
+        load_obj_attr()
+        load_env_attr()
+        load_path_scope()

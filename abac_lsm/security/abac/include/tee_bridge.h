@@ -8,6 +8,8 @@
 
 extern const struct file_operations abac_tee_request_fops;
 extern const struct file_operations abac_tee_response_fops;
+extern const struct file_operations abac_tee_policy_fops;
+extern const struct file_operations abac_tee_policy_fops;
 
 /*
  * Returns 1 when the enclave matches the complete sensitive part

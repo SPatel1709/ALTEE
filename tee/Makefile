@@ -1,85 +1,99 @@
 SGX_SDK ?= /opt/intel/sgxsdk
-SGX_MODE ?= HW
-SGX_DEBUG ?= 1
 
 CC := gcc
-SGX_EDGER8R := $(SGX_SDK)/bin/x64/sgx_edger8r
+EDGER8R := $(SGX_SDK)/bin/x64/sgx_edger8r
 SGX_SIGN := $(SGX_SDK)/bin/x64/sgx_sign
-SGX_LIBDIR := $(SGX_SDK)/lib64
+SGX_LIB := $(SGX_SDK)/lib64
+PROTOCOL := ../abac_lsm/security/abac/include/abac_tee_protocol.h
 
-COMMON_FLAGS := -m64 -O2 -Wall -Wextra -std=c11
+CFLAGS := -m64 -O2 -Wall -Wextra -std=c11
+APP_CFLAGS := $(CFLAGS) -I$(SGX_SDK)/include -Iinclude/test \
+        -I../abac_lsm/security/abac/include
+APP_LIBS := -L$(SGX_LIB) -lsgx_urts -lpthread
 
-APP_FLAGS := $(COMMON_FLAGS) -I$(SGX_SDK)/include -IApp -I../abac_lsm/security/abac/include
-APP_LIBS := -L$(SGX_LIBDIR) -lsgx_urts -lpthread
+ENCLAVE_CFLAGS := $(CFLAGS) -nostdinc -fvisibility=hidden -fpie \
+        -fstack-protector -I$(SGX_SDK)/include \
+        -I$(SGX_SDK)/include/tlibc -Iinclude/enclave \
+        -I../abac_lsm/security/abac/include
 
-ENCLAVE_FLAGS := $(COMMON_FLAGS) -nostdinc -fvisibility=hidden -fpie \
-	-fstack-protector -I$(SGX_SDK)/include \
-	-I$(SGX_SDK)/include/tlibc -IEnclave -I../abac_lsm/security/abac/include
+ENCLAVE_LDFLAGS := -m64 -nostdlib -nodefaultlibs -nostartfiles \
+        -L$(SGX_LIB) -Wl,--no-undefined \
+        -Wl,--whole-archive -lsgx_trts -Wl,--no-whole-archive \
+        -Wl,--start-group -lsgx_tstdc -lsgx_tcrypto -lsgx_tservice \
+        -Wl,--end-group -Wl,-Bstatic -Wl,-Bsymbolic \
+        -Wl,-pie,-eenclave_entry -Wl,--export-dynamic \
+        -Wl,--defsym,__ImageBase=0 -Wl,--gc-sections \
+        -Wl,--version-script=src/enclave/Enclave.lds
 
-ENCLAVE_LIBS := -m64 -Wl,--no-undefined -nostdlib -nodefaultlibs \
-	-nostartfiles -L$(SGX_LIBDIR) \
-	-Wl,--whole-archive -lsgx_trts -Wl,--no-whole-archive \
-	-Wl,--start-group -lsgx_tstdc -lsgx_tcrypto -lsgx_tservice \
-	-Wl,--end-group -Wl,-Bstatic -Wl,-Bsymbolic \
-	-Wl,--no-undefined -Wl,-pie,-eenclave_entry \
-	-Wl,--export-dynamic -Wl,--defsym,__ImageBase=0 \
-	-Wl,--gc-sections -Wl,--version-script=Enclave/Enclave.lds
+.PHONY: all dirs run clean
 
-APP_OBJECTS := App/App.o App/Enclave_u.o
-DAEMON_OBJECTS := App/Daemon.o App/Enclave_u.o
-ENCLAVE_OBJECTS := Enclave/Enclave.o Enclave/Enclave_t.o
+all: build/bin/Test build/bin/abac-tee-daemon \
+        build/enclave/enclave.signed.so
 
-.PHONY: all clean run
+dirs:
+	mkdir -p build/bin build/obj build/generated/untrusted \
+	        build/generated/trusted build/enclave \
+	        include/test include/enclave
 
-all: app abac-tee-daemon Enclave/enclave.signed.so
+build/generated/untrusted/Enclave_u.c include/test/Enclave_u.h &: \
+        src/enclave/Enclave.edl | dirs
+	$(EDGER8R) --untrusted $< --search-path src/enclave \
+	        --search-path $(SGX_SDK)/include \
+	        --untrusted-dir build/generated/untrusted
+	mv -f build/generated/untrusted/Enclave_u.h include/test/
 
-App/Enclave_u.c App/Enclave_u.h: Enclave/Enclave.edl
-	$(SGX_EDGER8R) --untrusted $< --search-path Enclave \
-		--search-path $(SGX_SDK)/include --untrusted-dir App
+build/generated/trusted/Enclave_t.c include/enclave/Enclave_t.h &: \
+        src/enclave/Enclave.edl | dirs
+	$(EDGER8R) --trusted $< --search-path src/enclave \
+	        --search-path $(SGX_SDK)/include \
+	        --trusted-dir build/generated/trusted
+	mv -f build/generated/trusted/Enclave_t.h include/enclave/
 
-Enclave/Enclave_t.c Enclave/Enclave_t.h: Enclave/Enclave.edl
-	$(SGX_EDGER8R) --trusted $< --search-path Enclave \
-		--search-path $(SGX_SDK)/include --trusted-dir Enclave
+build/obj/test_main.o: Test/test_main.c include/test/Enclave_u.h \
+        $(PROTOCOL) | dirs
+	$(CC) $(APP_CFLAGS) -c $< -o $@
 
-App/App.o: App/App.c App/Enclave_u.h ../abac_lsm/security/abac/include/abac_tee_protocol.h
-	$(CC) $(APP_FLAGS) -c $< -o $@
+build/obj/Daemon.o: src/daemon/Daemon.c include/test/Enclave_u.h \
+        $(PROTOCOL) | dirs
+	$(CC) $(APP_CFLAGS) -c $< -o $@
 
-App/Daemon.o: App/Daemon.c App/Enclave_u.h ../abac_lsm/security/abac/include/abac_tee_protocol.h
-	$(CC) $(APP_FLAGS) -c $< -o $@
+build/obj/Enclave_u.o: build/generated/untrusted/Enclave_u.c \
+        include/test/Enclave_u.h | dirs
+	$(CC) $(APP_CFLAGS) -c $< -o $@
 
-App/Enclave_u.o: App/Enclave_u.c App/Enclave_u.h
-	$(CC) $(APP_FLAGS) -c $< -o $@
+build/bin/Test: build/obj/test_main.o build/obj/Enclave_u.o | dirs
+	$(CC) $(CFLAGS) $^ -o $@ $(APP_LIBS)
 
-app: $(APP_OBJECTS)
-	$(CC) $(COMMON_FLAGS) $^ -o $@ $(APP_LIBS)
+build/bin/abac-tee-daemon: build/obj/Daemon.o \
+        build/obj/Enclave_u.o | dirs
+	$(CC) $(CFLAGS) $^ -o $@ $(APP_LIBS)
 
-abac-tee-daemon: $(DAEMON_OBJECTS)
-	$(CC) $(COMMON_FLAGS) $^ -o $@ $(APP_LIBS)
+build/obj/Enclave.o: src/enclave/Enclave.c \
+        include/enclave/Enclave_t.h $(PROTOCOL) | dirs
+	$(CC) $(ENCLAVE_CFLAGS) -c $< -o $@
 
-Enclave/Enclave.o: Enclave/Enclave.c Enclave/Enclave_t.h \
-	../abac_lsm/security/abac/include/abac_tee_protocol.h
-	$(CC) $(ENCLAVE_FLAGS) -c $< -o $@
+build/obj/Enclave_t.o: build/generated/trusted/Enclave_t.c \
+        include/enclave/Enclave_t.h | dirs
+	$(CC) $(ENCLAVE_CFLAGS) -c $< -o $@
 
-Enclave/Enclave_t.o: Enclave/Enclave_t.c Enclave/Enclave_t.h
-	$(CC) $(ENCLAVE_FLAGS) -c $< -o $@
+build/enclave/enclave.so: build/obj/Enclave.o \
+        build/obj/Enclave_t.o | dirs
+	$(CC) $^ -o $@ $(ENCLAVE_LDFLAGS)
 
-Enclave/enclave.so: $(ENCLAVE_OBJECTS)
-	$(CC) $^ -o $@ $(ENCLAVE_LIBS)
-
-Enclave/Enclave_private_test.pem:
+build/enclave/Enclave_private_test.pem: | dirs
 	openssl genrsa -3 -out $@ 3072
 
-Enclave/enclave.signed.so: Enclave/enclave.so \
-	Enclave/Enclave_private_test.pem Enclave/Enclave.config.xml
-	$(SGX_SIGN) sign -key Enclave/Enclave_private_test.pem \
-		-enclave Enclave/enclave.so -out $@ \
-		-config Enclave/Enclave.config.xml
+build/enclave/enclave.signed.so: build/enclave/enclave.so \
+        build/enclave/Enclave_private_test.pem \
+        src/enclave/Enclave.config.xml | dirs
+	$(SGX_SIGN) sign \
+	        -key build/enclave/Enclave_private_test.pem \
+	        -enclave build/enclave/enclave.so \
+	        -out $@ -config src/enclave/Enclave.config.xml
 
 run: all
-	./app
+	./build/bin/Test
 
 clean:
-	rm -f app abac-tee-daemon $(APP_OBJECTS) App/Daemon.o $(ENCLAVE_OBJECTS) \
-		App/Enclave_u.c App/Enclave_u.h \
-		Enclave/Enclave_t.c Enclave/Enclave_t.h \
-		Enclave/enclave.so Enclave/enclave.signed.so
+	rm -rf build
+	rm -f include/test/Enclave_u.h include/enclave/Enclave_t.h
