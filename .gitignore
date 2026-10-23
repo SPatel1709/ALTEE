@@ -21,3 +21,7 @@ venv/
 /tee_benchmark_results.tar.gz
 /perf_eval/generated/*
 !/perf_eval/generated/sample/
+
+# Report-generation environment and outputs
+/.venv-report/
+/perf_eval/report_figures/
