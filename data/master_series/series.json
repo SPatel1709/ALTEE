@@ -1,0 +1,45 @@
+{
+  "master_sha256": "cc86656e93fcc81f66f39b51c8eebe93cbd05ed485de36d31bf421f1e5a6d6d6",
+  "subject": "S_83",
+  "uid": 1000,
+  "seed": 20261019,
+  "sizes": {
+    "10": {
+      "25": "D10_T25"
+    },
+    "50": {
+      "25": "D50_T25"
+    },
+    "100": {
+      "25": "D100_T25"
+    },
+    "500": {
+      "25": "D500_T25"
+    },
+    "1000": {
+      "25": "D1000_T25",
+      "50": "D1000_T50",
+      "75": "D1000_T75",
+      "100": "D1000_T100"
+    }
+  },
+  "fixed_requests": [
+    {
+      "expected": "ALLOW",
+      "object": "O_47"
+    },
+    {
+      "expected": "ALLOW",
+      "object": "O_20"
+    },
+    {
+      "expected": "DENY",
+      "object": "O_43"
+    },
+    {
+      "expected": "DENY",
+      "object": "O_26"
+    }
+  ],
+  "note": "Run under the configured weekday working-hours context. Use abac load --tee for updates."
+}

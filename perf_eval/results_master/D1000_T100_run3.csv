@@ -1,0 +1,2 @@
+label,samples,allows,denies,mean_ns,p50_ns,p95_ns,p99_ns,ops_per_sec
+D1000_T100_run3,1000,500,500,11770947.6,12140494,13688602,14051662,85.0

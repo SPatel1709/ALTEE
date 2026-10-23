@@ -1,0 +1,4 @@
+ALLOW /home/secured/musima/O_47.txt
+ALLOW /home/secured/musima/O_20.txt
+DENY /home/secured/musima/O_43.txt
+DENY /home/secured/musima/O_26.txt
