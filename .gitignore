@@ -15,3 +15,9 @@ venv/
 /tee/build/
 /tee/include/enclave/Enclave_t.h
 /tee/include/test/Enclave_u.h
+
+# Local benchmark outputs
+/perf_eval/tee_read_bench
+/tee_benchmark_results.tar.gz
+/perf_eval/generated/*
+!/perf_eval/generated/sample/
