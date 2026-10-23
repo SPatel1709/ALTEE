@@ -1,4 +1,5 @@
 #include "Enclave_u.h"
+#include "attestation.h"
 #include "abac_tee_protocol.h"
 
 #include <sgx_urts.h>
@@ -181,6 +182,15 @@ int main(void)
         }
 
         evaluation.policy_generation = 1;
+#ifdef ABAC_TEE_SIMULATION
+        if (generate_attestation_quote(enclave_id, 1,
+                                       "build/attestation") != 0) {
+                fprintf(stderr, "Simulation attestation quote failed\n");
+                sgx_destroy_enclave(enclave_id);
+                return 1;
+        }
+#endif
+
         evaluation.rule = rule;
 
         /* Tuesday at 10:00: all conditions should match. */

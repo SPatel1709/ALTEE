@@ -6,10 +6,12 @@
 #include <string.h>
 
 #include <sgx_tseal.h>
+#include <sgx_trts.h>
+#include <sgx_utils.h>
 
-#define ABAC_TEE_MAX_RULES 64
+#define ABAC_TEE_MAX_RULES 1024
 #define ABAC_TEE_STATE_MAGIC 0x41424143U
-#define ABAC_TEE_STATE_VERSION 2U
+#define ABAC_TEE_STATE_VERSION 3U
 
 typedef struct {
         uint32_t magic;
@@ -407,6 +409,54 @@ int ecall_get_policy_generation(uint64_t *generation)
                 return ABAC_TEE_INVALID_REQUEST;
 
         *generation = trusted_state.policy_generation;
+        return ABAC_TEE_SUCCESS;
+}
+
+int ecall_create_attestation_report(const uint8_t *target_info_data,
+                                    size_t target_info_size,
+                                    const uint8_t *nonce, size_t nonce_size,
+                                    uint8_t *report_output,
+                                    size_t report_size)
+{
+        sgx_target_info_t target_info;
+        sgx_report_data_t report_data = { 0 };
+        sgx_report_t report;
+        uint32_t version = ABAC_TEE_ATTESTATION_DATA_VERSION;
+        sgx_status_t status;
+
+        if (!target_info_data || !nonce || !report_output)
+                return ABAC_TEE_INVALID_REQUEST;
+
+        if (target_info_size != sizeof(target_info) ||
+            nonce_size != ABAC_TEE_ATTESTATION_NONCE_SIZE ||
+            report_size != sizeof(report))
+                return ABAC_TEE_INVALID_REQUEST;
+
+        if (update_in_progress)
+                return ABAC_TEE_UPDATE_IN_PROGRESS;
+
+        if (!trusted_state.policy_generation)
+                return ABAC_TEE_STATE_INVALID;
+
+        memcpy(&target_info, target_info_data, sizeof(target_info));
+
+        /*
+         * report_data layout:
+         * bytes 0-31  : attestation nonce
+         * bytes 32-39 : active policy generation
+         * bytes 40-43 : attestation data format version
+         * bytes 44-63 : reserved
+         */
+        memcpy(report_data.d, nonce, ABAC_TEE_ATTESTATION_NONCE_SIZE);
+        memcpy(report_data.d + 32, &trusted_state.policy_generation,
+               sizeof(trusted_state.policy_generation));
+        memcpy(report_data.d + 40, &version, sizeof(version));
+
+        status = sgx_create_report(&target_info, &report_data, &report);
+        if (status != SGX_SUCCESS)
+                return ABAC_TEE_ATTESTATION_FAILED;
+
+        memcpy(report_output, &report, sizeof(report));
         return ABAC_TEE_SUCCESS;
 }
 

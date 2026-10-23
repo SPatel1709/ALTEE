@@ -34,6 +34,14 @@ enclave {
                 public int ecall_get_policy_generation(
                         [out] uint64_t *generation);
 
+                public int ecall_create_attestation_report(
+                        [in, size=target_info_size] const uint8_t *target_info_data,
+                        size_t target_info_size,
+                        [in, size=nonce_size] const uint8_t *nonce,
+                        size_t nonce_size,
+                        [out, size=report_size] uint8_t *report_data,
+                        size_t report_size);
+
                 public int ecall_clear_rules();
         };
 };

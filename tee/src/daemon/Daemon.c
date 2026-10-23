@@ -1,5 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 #include "Enclave_u.h"
+#include "attestation.h"
 #include "abac_tee_protocol.h"
 
 #include <sgx_urts.h>
@@ -612,7 +613,7 @@ int main(void)
         }
 
         if (restored_state == 0) {
-                active_generation = 1;
+                active_generation = update_pending ? requested_generation : 1;
 
                 if (load_policy_transaction(enclave_id, active_generation, &loaded_rules) != 0) {
                         sgx_destroy_enclave(enclave_id);
@@ -653,6 +654,10 @@ int main(void)
                 sgx_destroy_enclave(enclave_id);
                 return 1;
         }
+
+        if (generate_attestation_quote(enclave_id, active_generation,
+                                       TEE_STATE_DIRECTORY) != 0)
+                fprintf(stderr, "Attestation quote unavailable; continuing without a quote\n");
 
         request_fd = open(TEE_REQUEST_FILE, O_RDONLY);
         if (request_fd < 0) {
@@ -738,9 +743,11 @@ int main(void)
                         break;
                 }
 
+#ifdef ABAC_TEE_TRACE_REQUESTS
                 printf("request=%llu rule=%u attributes=%u result=%s\n",(unsigned long long)request.request_id,
                         request.rule.rule_id, request.rule.attribute_count,response.matched ? "MATCH" : "NO MATCH");
                 fflush(stdout);
+#endif
         }
 
         close(response_fd);

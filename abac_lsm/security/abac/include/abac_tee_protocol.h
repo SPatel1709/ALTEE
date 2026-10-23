@@ -19,6 +19,8 @@ typedef int32_t abac_tee_s32;
 #define ABAC_TEE_MAX_ATTRIBUTES 16
 #define ABAC_TEE_NAME_SIZE      64
 #define ABAC_TEE_VALUE_SIZE     128
+#define ABAC_TEE_ATTESTATION_NONCE_SIZE 32
+#define ABAC_TEE_ATTESTATION_DATA_VERSION 1U
 
 enum abac_tee_attribute_type {
         ABAC_TEE_USER_ATTRIBUTE = 1,
@@ -40,7 +42,8 @@ enum abac_tee_status {
         ABAC_TEE_STATE_INVALID = -7,
         ABAC_TEE_UPDATE_IN_PROGRESS = -8,
         ABAC_TEE_NO_UPDATE = -9,
-        ABAC_TEE_GENERATION_INVALID = -10
+        ABAC_TEE_GENERATION_INVALID = -10,
+        ABAC_TEE_ATTESTATION_FAILED = -11
 };
 
 typedef struct {
