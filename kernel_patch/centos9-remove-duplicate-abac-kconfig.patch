@@ -1,0 +1,9 @@
+--- a/security/Kconfig
++++ b/security/Kconfig
+@@ -248,6 +248,5 @@
+ source "security/abac/Kconfig"
+ source "security/Kconfig.hardening"
+ 
+-source "security/abac/Kconfig"
+ endmenu
+ 
