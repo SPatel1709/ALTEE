@@ -7,6 +7,9 @@
 #include "avp.h"
 #include "policy.h"
 
+
+
+// siblings are denoted by *next as for a parent maintaining **ptr for children is difficult.
 struct abac_effect_leaf {
 	enum abac_effect effect;
 	struct abac_effect_leaf *next;
@@ -97,8 +100,7 @@ static bool compare_op(enum abac_op rule_op, enum abac_op access_op,
 	return false;
 }
 
-static struct abac_obj_bucket *find_object_bucket(struct abac_policy_tree *tree,
-						  avp *object)
+static struct abac_obj_bucket *find_object_bucket(struct abac_policy_tree *tree,avp *object)
 {
 	struct abac_obj_bucket *bucket = tree->objects;
 
@@ -173,6 +175,8 @@ struct abac_policy_tree *build_policy_tree(abac_rule *rules)
 		if (!obj_bucket) {
 			obj_bucket = kcalloc(1, sizeof(*obj_bucket), GFP_KERNEL);
 			obj_bucket->object = clone_avp_list(rule->object);
+
+			// we are adding the sibling at the head.
 			obj_bucket->next = tree->objects;
 			tree->objects = obj_bucket;
 		}
@@ -243,8 +247,7 @@ void destroy_policy_tree(struct abac_policy_tree *tree)
 	kfree(tree);
 }
 
-bool resolve_policy_tree(struct abac_policy_tree *tree, avp *uattr, avp *oattr,
-			 avp *env, enum abac_op op)
+bool resolve_policy_tree(struct abac_policy_tree *tree, avp *uattr, avp *oattr,avp *env, enum abac_op op)
 {
 	struct abac_obj_bucket *obj_bucket;
 	struct abac_op_bucket *op_bucket;

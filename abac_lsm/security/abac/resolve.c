@@ -34,13 +34,15 @@ void abac_destroy_lookup_maps(void)
 
 	while (u_cursor != NULL) {
 		if (!hlist_unhashed(&u_cursor->hnode))
-			hlist_del_init(&u_cursor->hnode);
+				hlist_del_init(&u_cursor->hnode);
+
 		u_cursor = u_cursor->next;
 	}
 
 	while (o_cursor != NULL) {
 		if (!hlist_unhashed(&o_cursor->hnode))
-			hlist_del_init(&o_cursor->hnode);
+				hlist_del_init(&o_cursor->hnode);
+
 		o_cursor = o_cursor->next;
 	}
 }
@@ -62,8 +64,7 @@ void abac_rebuild_lookup_maps(void)
 
 	while (o_cursor != NULL) {
 		INIT_HLIST_NODE(&o_cursor->hnode);
-		hash_add(abac_obj_map, &o_cursor->hnode,
-			 abac_obj_key(o_cursor->path));
+		hash_add(abac_obj_map, &o_cursor->hnode,abac_obj_key(o_cursor->path));
 		o_cursor = o_cursor->next;
 	}
 }
@@ -78,8 +79,7 @@ static bool avp_contains(avp *required, avp *actual)
 		a_cursor = actual;
 		match_found = false;
 		while (a_cursor != NULL) {
-			if (strcmp(r_cursor->name, a_cursor->name) == 0 &&
-			    strcmp(r_cursor->value, a_cursor->value) == 0) {
+			if (strcmp(r_cursor->name, a_cursor->name) == 0 && strcmp(r_cursor->value, a_cursor->value) == 0) {
 				match_found = true;
 				break;
 			}
@@ -93,9 +93,7 @@ static bool avp_contains(avp *required, avp *actual)
 }
 
 
-static bool tee_section_matches(avp *required, avp *actual,
-                                abac_tee_u32 attribute_type,
-                                abac_tee_rule_data_t *request)
+static bool tee_section_matches(avp *required, avp *actual,abac_tee_u32 attribute_type,abac_tee_rule_data_t *request)
 {
         avp *required_cursor;
         avp *actual_cursor;
@@ -108,11 +106,8 @@ static bool tee_section_matches(avp *required, avp *actual,
                 actual_cursor = actual;
 
                 while (actual_cursor) {
-                        if (strcmp(required_cursor->name,
-                                   actual_cursor->name) == 0 &&
-                            (required_cursor->tee_protected ||
-                             strcmp(required_cursor->value,
-                                    actual_cursor->value) == 0)) {
+                        if (strcmp(required_cursor->name,actual_cursor->name) == 0 &&
+                            (required_cursor->tee_protected || strcmp(required_cursor->value,actual_cursor->value) == 0)) {
                                 matched = true;
                                 break;
                         }
@@ -123,22 +118,15 @@ static bool tee_section_matches(avp *required, avp *actual,
                         return false;
 
                 if (required_cursor->tee_protected) {
-                        if (request->attribute_count >=
-                            ABAC_TEE_MAX_ATTRIBUTES)
+                        if (request->attribute_count >= ABAC_TEE_MAX_ATTRIBUTES)
                                 return false;
 
-                        tee_attribute =
-                                &request->attributes[
-                                        request->attribute_count];
+                        tee_attribute =&request->attributes[request->attribute_count];
 
                         tee_attribute->type = attribute_type;
-                        if (strscpy(tee_attribute->name,
-                                    required_cursor->name,
-                                    sizeof(tee_attribute->name)) < 0)
+                        if (strscpy(tee_attribute->name,required_cursor->name,sizeof(tee_attribute->name)) < 0)
                                 return false;
-                        if (strscpy(tee_attribute->value,
-                                    actual_cursor->value,
-                                    sizeof(tee_attribute->value)) < 0)
+                        if (strscpy(tee_attribute->value,actual_cursor->value,sizeof(tee_attribute->value)) < 0)
                                 return false;
 
                         request->attribute_count++;
@@ -150,17 +138,17 @@ static bool tee_section_matches(avp *required, avp *actual,
         return true;
 }
 
-static bool op_matches(enum abac_op rule_op, enum abac_op access_op,
-		       enum abac_effect effect)
+static bool op_matches(enum abac_op rule_op, enum abac_op access_op,enum abac_effect effect)
 {
 	if (rule_op == access_op)
 		return true;
-	if (effect == ABAC_ALLOW && rule_op == ABAC_MODIFY &&
-	    access_op == ABAC_READ)
+	if (effect == ABAC_ALLOW && rule_op == ABAC_MODIFY && access_op == ABAC_READ)
 		return true;
 	return false;
 }
 
+
+// Returns attributes assigned to a User.
 static avp *get_user_avp(unsigned int UID, abac_user *head)
 {
 	abac_user *hashed;
@@ -174,6 +162,7 @@ static avp *get_user_avp(unsigned int UID, abac_user *head)
 		return NULL;
 	}
 
+	// We are deliberately checking all the Buckets is User not found in it's Bucket.
 	while (cursor != NULL) {
 		if (cursor->uid == UID) {
 			return cursor->attrs;
@@ -183,6 +172,7 @@ static avp *get_user_avp(unsigned int UID, abac_user *head)
 	return NULL;
 }
 
+// Returns attributes assigned to File/Folder.
 static avp *get_obj_avp(char *path, abac_obj *head)
 {
 	abac_obj *hashed;
@@ -357,19 +347,9 @@ bool abac_resolve_linear(unsigned int UID, char *path, int mask)
                         memset(tee_request, 0, sizeof(*tee_request));
                         tee_request->rule_id = rule->id;
 
-                        attributes_match =
-                                tee_section_matches(
-                                        rule->object, oattr,
-                                        ABAC_TEE_OBJECT_ATTRIBUTE,
-                                        tee_request) &&
-                                tee_section_matches(
-                                        rule->user, uattr,
-                                        ABAC_TEE_USER_ATTRIBUTE,
-                                        tee_request) &&
-                                tee_section_matches(
-                                        rule->env, env_attr,
-                                        ABAC_TEE_ENV_ATTRIBUTE,
-                                        tee_request);
+                        attributes_match = tee_section_matches(rule->object, oattr,ABAC_TEE_OBJECT_ATTRIBUTE,tee_request)
+										&& tee_section_matches(rule->user, uattr,ABAC_TEE_USER_ATTRIBUTE,tee_request)
+										&& tee_section_matches(rule->env, env_attr,ABAC_TEE_ENV_ATTRIBUTE,tee_request);
 
                         if (!attributes_match) {
                                 rule = rule->next;
@@ -382,11 +362,8 @@ bool abac_resolve_linear(unsigned int UID, char *path, int mask)
                                 continue;
                         }
                 } else {
-                        if (!avp_contains(rule->object, oattr) ||
-                            !avp_contains(rule->user, uattr) ||
-                            (rule->env &&
-                             (!env_attr ||
-                              !avp_contains(rule->env, env_attr)))) {
+                        if (!avp_contains(rule->object, oattr) || !avp_contains(rule->user, uattr) ||
+								(rule->env && (!env_attr || !avp_contains(rule->env, env_attr)))) {
                                 rule = rule->next;
                                 continue;
                         }

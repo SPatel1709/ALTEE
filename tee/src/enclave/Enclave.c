@@ -55,8 +55,10 @@ static int valid_rule_data(const abac_tee_rule_data_t *rule)
         for (i = 0; i < rule->attribute_count; i++) {
                 const abac_tee_attribute_t *attribute = &rule->attributes[i];
 
+                                        // Enum 1                                       // Enum 3
                 if (attribute->type < ABAC_TEE_USER_ATTRIBUTE || attribute->type > ABAC_TEE_ENV_ATTRIBUTE)
                         return 0;
+
                 if (!has_terminator(attribute->name, ABAC_TEE_NAME_SIZE) || !has_terminator(attribute->value, ABAC_TEE_VALUE_SIZE))
                         return 0;
         }
@@ -98,18 +100,14 @@ static int current_time_is_working_time(uint32_t minute)
         return minute >= start || minute < end;
 }
 
-static int attribute_matches(
-        const abac_tee_attribute_t *expected,
-        const abac_tee_attribute_t *actual,
-        const abac_tee_env_context_t *environment)
+static int attribute_matches(const abac_tee_attribute_t *expected, const abac_tee_attribute_t *actual, const abac_tee_env_context_t *environment)
 {
         int condition_result;
 
         if (!same_attribute_identity(expected, actual))
                 return 0;
 
-        if (expected->type == ABAC_TEE_ENV_ATTRIBUTE &&
-            strncmp(expected->name, "day", ABAC_TEE_NAME_SIZE) == 0) {
+        if (expected->type == ABAC_TEE_ENV_ATTRIBUTE && strncmp(expected->name, "day", ABAC_TEE_NAME_SIZE) == 0) {
                 if (!trusted_env_configured)
                         return 0;
 
@@ -124,8 +122,7 @@ static int attribute_matches(
                 return 0;
         }
 
-        if (expected->type == ABAC_TEE_ENV_ATTRIBUTE &&
-            strncmp(expected->name, "time",ABAC_TEE_NAME_SIZE) == 0) {
+        if (expected->type == ABAC_TEE_ENV_ATTRIBUTE && strncmp(expected->name, "time",ABAC_TEE_NAME_SIZE) == 0) {
                 if (!trusted_env_configured)
                         return 0;
 
@@ -218,16 +215,15 @@ int ecall_evaluate_rule(const uint8_t *request_data, size_t request_size, int *m
                 return ABAC_TEE_INVALID_REQUEST;
         *matched = 0;
 
-        if (!request_data ||
-            request_size != sizeof(abac_tee_eval_data_t))
+        if (!request_data || request_size != sizeof(abac_tee_eval_data_t))
                 return ABAC_TEE_INVALID_REQUEST;
 
         evaluation = (const abac_tee_eval_data_t *)request_data;
 
         if (update_in_progress)
                 return ABAC_TEE_UPDATE_IN_PROGRESS;
-        if (!evaluation->policy_generation ||
-            evaluation->policy_generation != trusted_state.policy_generation)
+
+        if (!evaluation->policy_generation || evaluation->policy_generation != trusted_state.policy_generation)
                 return ABAC_TEE_GENERATION_INVALID;
 
         request = &evaluation->rule;
@@ -235,8 +231,7 @@ int ecall_evaluate_rule(const uint8_t *request_data, size_t request_size, int *m
         if (!valid_rule_data(request))
                 return ABAC_TEE_INVALID_REQUEST;
 
-        if (evaluation->environment.day_of_week > 6 ||
-            evaluation->environment.minute_of_day >= 24U * 60U)
+        if (evaluation->environment.day_of_week > 6 || evaluation->environment.minute_of_day >= 24U * 60U)
                 return ABAC_TEE_INVALID_REQUEST;
 
         slot = find_rule(request->rule_id);
@@ -249,10 +244,7 @@ int ecall_evaluate_rule(const uint8_t *request_data, size_t request_size, int *m
                 found = 0;
 
                 for (j = 0; j < request->attribute_count; j++) {
-                        if (attribute_matches(
-                                    &expected->attributes[i],
-                                    &request->attributes[j],
-                                    &evaluation->environment)) {
+                        if (attribute_matches(&expected->attributes[i],&request->attributes[j],&evaluation->environment)) {
                                 found = 1;
                                 break;
                         }
@@ -412,11 +404,8 @@ int ecall_get_policy_generation(uint64_t *generation)
         return ABAC_TEE_SUCCESS;
 }
 
-int ecall_create_attestation_report(const uint8_t *target_info_data,
-                                    size_t target_info_size,
-                                    const uint8_t *nonce, size_t nonce_size,
-                                    uint8_t *report_output,
-                                    size_t report_size)
+int ecall_create_attestation_report(const uint8_t *target_info_data, size_t target_info_size, const uint8_t *nonce, size_t nonce_size,
+                                    uint8_t *report_output, size_t report_size)
 {
         sgx_target_info_t target_info;
         sgx_report_data_t report_data = { 0 };
@@ -427,9 +416,7 @@ int ecall_create_attestation_report(const uint8_t *target_info_data,
         if (!target_info_data || !nonce || !report_output)
                 return ABAC_TEE_INVALID_REQUEST;
 
-        if (target_info_size != sizeof(target_info) ||
-            nonce_size != ABAC_TEE_ATTESTATION_NONCE_SIZE ||
-            report_size != sizeof(report))
+        if (target_info_size != sizeof(target_info) || nonce_size != ABAC_TEE_ATTESTATION_NONCE_SIZE || report_size != sizeof(report))
                 return ABAC_TEE_INVALID_REQUEST;
 
         if (update_in_progress)
@@ -448,8 +435,7 @@ int ecall_create_attestation_report(const uint8_t *target_info_data,
          * bytes 44-63 : reserved
          */
         memcpy(report_data.d, nonce, ABAC_TEE_ATTESTATION_NONCE_SIZE);
-        memcpy(report_data.d + 32, &trusted_state.policy_generation,
-               sizeof(trusted_state.policy_generation));
+        memcpy(report_data.d + 32, &trusted_state.policy_generation, sizeof(trusted_state.policy_generation));
         memcpy(report_data.d + 40, &version, sizeof(version));
 
         status = sgx_create_report(&target_info, &report_data, &report);

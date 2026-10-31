@@ -73,6 +73,7 @@ static struct lsm_id abac_lsmid __ro_after_init = {
 	.name = "abac",
 };
 
+// At Checkpoint file_permission invoke abac_file_permission function.
 static struct security_hook_list abac_hooks[] __ro_after_init = {
 	LSM_HOOK_INIT(file_permission, abac_file_permission),
 };
@@ -85,7 +86,6 @@ static int __init abac_init(void)
 	       "ABAC LSM: Initialized.\n Protected files are selected by ABAC include/exclude path rules.\n");
 	return 0;
 }
-
 DEFINE_LSM(abac) = {
 	.init = abac_init,
 	.name = "abac",

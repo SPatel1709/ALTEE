@@ -508,8 +508,7 @@ static int load_policy_transaction(sgx_enclave_id_t enclave_id, uint64_t generat
                 return -1;
 
         *loaded_rules = loaded;
-        printf("TEE policy generation %llu committed: %d rule(s)\n",
-                (unsigned long long)generation, loaded);
+        printf("TEE policy generation %llu committed: %d rule(s)\n",(unsigned long long)generation, loaded);
 
         return 0;
 

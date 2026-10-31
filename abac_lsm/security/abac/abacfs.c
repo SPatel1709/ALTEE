@@ -85,8 +85,7 @@ bool abac_path_is_covered(const char *path)
         if (!path_matches_entries(path, abac_include_paths))
                 return false;
 
-        if (abac_exclude_paths &&
-            path_matches_entries(path, abac_exclude_paths))
+        if (abac_exclude_paths && path_matches_entries(path, abac_exclude_paths))
                 return false;
 
         return true;
@@ -100,8 +99,7 @@ static int abac_open(struct inode *i, struct file *f)
 }
 
 // method for writing to policy file
-static ssize_t policy_write(struct file *filp, const char __user *buffer,
-			    size_t len, loff_t *off)
+static ssize_t policy_write(struct file *filp, const char __user *buffer,size_t len, loff_t *off)
 {
 	if (len >= MAX_FILE_SIZE) {
 		printk(KERN_INFO
@@ -115,8 +113,7 @@ static ssize_t policy_write(struct file *filp, const char __user *buffer,
 	}
 	policy_buf = kmalloc(len + 1, GFP_KERNEL);
 	if (!policy_buf) {
-		printk(KERN_INFO
-		       "Write failed. Failed to allocate memory for policy buffer\n");
+		printk(KERN_INFO "Write failed. Failed to allocate memory for policy buffer\n");
 		return -EFAULT;
 	}
 	if (copy_from_user(policy_buf, buffer, len)) {
@@ -157,8 +154,7 @@ finished = 1;
 }
 
 // method for writing to user_attrs file
-static ssize_t user_attr_write(struct file *filp, const char __user *buffer,
-			       size_t len, loff_t *off)
+static ssize_t user_attr_write(struct file *filp, const char __user *buffer,size_t len, loff_t *off)
 {
 	if (len >= MAX_FILE_SIZE) {
 		printk(KERN_INFO
@@ -339,8 +335,7 @@ static ssize_t exclude_paths_read(struct file *filp, char __user *buffer,
 				       strlen(exclude_paths_buf));
 }
 
-static ssize_t action_write(struct file *filp, const char __user *buffer,
-			    size_t len, loff_t *off)
+static ssize_t action_write(struct file *filp, const char __user *buffer, size_t len, loff_t *off)
 {
 	char cmd[32];
 	size_t copy_len = min(len, sizeof(cmd) - 1);
@@ -385,23 +380,18 @@ static ssize_t stats_read(struct file *filp, char __user *buffer, size_t len,
 
 	out_len = scnprintf(out, sizeof(out),
 			    "decision_count=%llu\nallow_count=%llu\ndeny_count=%llu\ntotal_time_ns=%llu\nmin_time_ns=%llu\nmax_time_ns=%llu\nprev_access_time_ns=%llu\n",
-			    abac_stats.decision_count, abac_stats.allow_count,
-			    abac_stats.deny_count, abac_stats.total_time_ns,
-			    abac_stats.min_time_ns, abac_stats.max_time_ns,
-			    abac_stats.prev_access_time_ns);
+			    abac_stats.decision_count, abac_stats.allow_count,abac_stats.deny_count, abac_stats.total_time_ns,
+			    abac_stats.min_time_ns, abac_stats.max_time_ns,abac_stats.prev_access_time_ns);
 	return simple_read_from_buffer(buffer, len, off, out, out_len);
 }
 
-static ssize_t mode_read(struct file *filp, char __user *buffer, size_t len,
-			 loff_t *off)
+static ssize_t mode_read(struct file *filp, char __user *buffer, size_t len, loff_t *off)
 {
-	const char *mode = abac_mode == ABAC_RESOLVE_LINEAR ? "linear\n" :
-							      "tree\n";
+	const char *mode = abac_mode == ABAC_RESOLVE_LINEAR ? "linear\n" : "tree\n";
 	return simple_read_from_buffer(buffer, len, off, mode, strlen(mode));
 }
 
-static ssize_t mode_write(struct file *filp, const char __user *buffer,
-			  size_t len, loff_t *off)
+static ssize_t mode_write(struct file *filp, const char __user *buffer, size_t len, loff_t *off)
 {
 	char mode[16];
 	size_t copy_len = min(len, sizeof(mode) - 1);
@@ -484,16 +474,14 @@ static const struct file_operations tee_mode_fops = {
         .write = tee_mode_write,
 };
 
-static ssize_t hashmap_read(struct file *filp, char __user *buffer, size_t len,
-			    loff_t *off)
+static ssize_t hashmap_read(struct file *filp, char __user *buffer, size_t len, loff_t *off)
 {
 	const char *state = abac_use_hashmap ? "on\n" : "off\n";
 
 	return simple_read_from_buffer(buffer, len, off, state, strlen(state));
 }
 
-static ssize_t hashmap_write(struct file *filp, const char __user *buffer,
-			     size_t len, loff_t *off)
+static ssize_t hashmap_write(struct file *filp, const char __user *buffer, size_t len, loff_t *off)
 {
 	char state[16];
 	size_t copy_len = min(len, sizeof(state) - 1);
@@ -504,13 +492,11 @@ static ssize_t hashmap_write(struct file *filp, const char __user *buffer,
 	if (copy_len > 0 && state[copy_len - 1] == '\n')
 		state[copy_len - 1] = '\0';
 
-	if (strcmp(state, "on") == 0 || strcmp(state, "1") == 0 ||
-	    strcmp(state, "enabled") == 0) {
+	if (strcmp(state, "on") == 0 || strcmp(state, "1") == 0 || strcmp(state, "enabled") == 0) {
 		abac_use_hashmap = true;
 		return len;
 	}
-	if (strcmp(state, "off") == 0 || strcmp(state, "0") == 0 ||
-	    strcmp(state, "disabled") == 0) {
+	if (strcmp(state, "off") == 0 || strcmp(state, "0") == 0 || strcmp(state, "disabled") == 0) {
 		abac_use_hashmap = false;
 		return len;
 	}
@@ -596,11 +582,9 @@ static int __init abac_create_fs(void)
 	}
 
 	// create the policy file
-	policy_file = securityfs_create_file("policy", 0600, abacfs, NULL,
-					     &policy_fops);
+	policy_file = securityfs_create_file("policy", 0600, abacfs, NULL,&policy_fops);
 	if (!policy_file) {
-		printk(KERN_ERR
-		       "ABAC LSM: Failed to create file /sys/kernel/security/abac/policy");
+		printk(KERN_ERR "ABAC LSM: Failed to create file /sys/kernel/security/abac/policy");
 		destroy_abac_fs();
 		return -ENOMEM;
 	}
@@ -608,54 +592,41 @@ static int __init abac_create_fs(void)
 	       "ABAC LSM: Created file /sys/kernel/security/abac/policy");
 
 	// create the user attributes file
-	user_attr_file = securityfs_create_file("user_attr", 0600, abacfs, NULL,
-						&user_attr_fops);
+	user_attr_file = securityfs_create_file("user_attr", 0600, abacfs, NULL,&user_attr_fops);
 	if (!user_attr_file) {
-		printk(KERN_ERR
-		       "ABAC LSM: Failed to create file /sys/kernel/security/abac/user_attr");
+		printk(KERN_ERR "ABAC LSM: Failed to create file /sys/kernel/security/abac/user_attr");
 		destroy_abac_fs();
 		return -ENOMEM;
 	}
-	printk(KERN_INFO
-	       "ABAC LSM: Created file /sys/kernel/security/abac/user_attr");
+	printk(KERN_INFO "ABAC LSM: Created file /sys/kernel/security/abac/user_attr");
 
 	// create the object attributes file
-	obj_attr_file = securityfs_create_file("obj_attr", 0600, abacfs, NULL,
-					       &obj_attr_fops);
+	obj_attr_file = securityfs_create_file("obj_attr", 0600, abacfs, NULL,&obj_attr_fops);
 	if (!obj_attr_file) {
-		printk(KERN_ERR
-		       "ABAC LSM: Failed to create file /sys/kernel/security/abac/obj_attr");
+		printk(KERN_ERR "ABAC LSM: Failed to create file /sys/kernel/security/abac/obj_attr");
 		destroy_abac_fs();
 		return -ENOMEM;
 	}
-	printk(KERN_INFO
-	       "ABAC LSM: Created file /sys/kernel/security/abac/obj_attr");
+	printk(KERN_INFO "ABAC LSM: Created file /sys/kernel/security/abac/obj_attr");
 
 	// create the environment attributes file
-	env_attr_file = securityfs_create_file("env_attr", 0600, abacfs, NULL,
-					       &env_attr_fops);
+	env_attr_file = securityfs_create_file("env_attr", 0600, abacfs, NULL,&env_attr_fops);
 	if (!env_attr_file) {
-		printk(KERN_ERR
-		       "ABAC LSM: Failed to create file /sys/kernel/security/abac/env_attr");
+		printk(KERN_ERR "ABAC LSM: Failed to create file /sys/kernel/security/abac/env_attr");
 		destroy_abac_fs();
 		return -ENOMEM;
 	}
-	printk(KERN_INFO
-	       "ABAC LSM: Created file /sys/kernel/security/abac/env_attr");
+	printk(KERN_INFO "ABAC LSM: Created file /sys/kernel/security/abac/env_attr");
 
-	action_file = securityfs_create_file("action", 0600, abacfs, NULL,
-					     &action_fops);
+	action_file = securityfs_create_file("action", 0600, abacfs, NULL,&action_fops);
 	if (!action_file) {
-		printk(KERN_ERR
-		       "ABAC LSM: Failed to create file /sys/kernel/security/abac/action");
+		printk(KERN_ERR "ABAC LSM: Failed to create file /sys/kernel/security/abac/action");
 		destroy_abac_fs();
 		return -ENOMEM;
 	}
-	printk(KERN_INFO
-	       "ABAC LSM: Created file /sys/kernel/security/abac/action");
+	printk(KERN_INFO "ABAC LSM: Created file /sys/kernel/security/abac/action");
 
-	perf_file = securityfs_create_file("perf", 0444, abacfs, NULL,
-					   &perf_fops);
+	perf_file = securityfs_create_file("perf", 0444, abacfs, NULL,&perf_fops);
 	if (!perf_file) {
 		printk(KERN_ERR
 		       "ABAC LSM: Failed to create file /sys/kernel/security/abac/perf");

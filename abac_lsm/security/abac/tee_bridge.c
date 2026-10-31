@@ -32,8 +32,7 @@ static abac_tee_u64 active_generation;
 static abac_tee_u64 pending_generation;
 static bool policy_update_in_progress;
 
-static ssize_t abac_tee_request_read(struct file *file, char __user *buffer,
-                                     size_t len, loff_t *offset)
+static ssize_t abac_tee_request_read(struct file *file, char __user *buffer, size_t len, loff_t *offset)
 {
         abac_tee_ipc_request_t *request;
         ssize_t ret;
