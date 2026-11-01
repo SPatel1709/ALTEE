@@ -6,10 +6,13 @@
 #ifndef _ABAC_AVP_H
 #define _ABAC_AVP_H
 
+#include <linux/types.h>
+
 typedef struct avp avp;
 struct avp {
     char *name;
     char *value;
+    bool tee_protected;
     avp *next;
 };
 

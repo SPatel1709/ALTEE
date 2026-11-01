@@ -1,0 +1,47 @@
+enclave {
+        trusted {
+                public int ecall_load_rule(
+                        [in, size=rule_size] const uint8_t *rule_data,
+                        size_t rule_size);
+
+                public int ecall_set_env_config(
+                        [in, size=config_size] const uint8_t *config_data,
+                        size_t config_size);
+
+                public int ecall_evaluate_rule(
+                        [in, size=request_size] const uint8_t *request_data,
+                        size_t request_size,
+                        [out] int *matched);
+
+                public int ecall_get_sealed_state_size(
+                        [out] uint32_t *sealed_size);
+
+                public int ecall_seal_state(
+                        [out, size=sealed_size] uint8_t *sealed_data,
+                        uint32_t sealed_size);
+
+                public int ecall_unseal_state(
+                        [in, size=sealed_size] const uint8_t *sealed_data,
+                        uint32_t sealed_size);
+
+                public int ecall_begin_policy_update(
+                        uint64_t new_generation);
+
+                public int ecall_commit_policy_update();
+
+                public int ecall_abort_policy_update();
+
+                public int ecall_get_policy_generation(
+                        [out] uint64_t *generation);
+
+                public int ecall_create_attestation_report(
+                        [in, size=target_info_size] const uint8_t *target_info_data,
+                        size_t target_info_size,
+                        [in, size=nonce_size] const uint8_t *nonce,
+                        size_t nonce_size,
+                        [out, size=report_size] uint8_t *report_data,
+                        size_t report_size);
+
+                public int ecall_clear_rules();
+        };
+};

@@ -1,0 +1,18 @@
+[Unit]
+Description=ABAC Intel SGX TEE Evaluation Daemon
+After=aesmd.service abac.service
+Requires=aesmd.service
+
+[Service]
+Type=simple
+StateDirectory=abac-tee
+StateDirectoryMode=0700
+WorkingDirectory=/usr/local/libexec/abac-tee
+Environment=LD_LIBRARY_PATH=/opt/intel/sgxsdk/sdk_libs
+ExecStartPre=/usr/sbin/modprobe isgx
+ExecStart=/usr/local/libexec/abac-tee/abac-tee-daemon
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

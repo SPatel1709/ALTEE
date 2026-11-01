@@ -34,26 +34,45 @@ int findidx(char *buffer, char ch, int start, int end)
 
 avp *parse_avp(char *buffer, int start, int end)
 {
-	// Parse a single attribute-value pair separated by =
-	// Example: Designation=Professor
-	int i;
-	int pair_delim = findidx(buffer, '=', start, end);
-	char *name = kcalloc(pair_delim - start, sizeof(char), GFP_KERNEL);
-	int j = 0;
-	for (i = start; i < pair_delim; i++) {
-		name[j++] = buffer[i];
+	int pair_delim;
+	int name_start;
+	int name_len;
+	int value_len;
+	avp *p;
+
+	if (!buffer || start >= end)
+		return NULL;
+
+	pair_delim = findidx(buffer, '=', start, end);
+	if (pair_delim <= start || pair_delim >= end - 1)
+		return NULL;
+
+	p = kcalloc(1, sizeof(*p), GFP_KERNEL);
+	if (!p)
+		return NULL;
+
+	name_start = start;
+	if (pair_delim - start > 4 &&
+	    strncmp(buffer + start, "tee:", 4) == 0) {
+		p->tee_protected = true;
+		name_start += 4;
 	}
-	name[j] = '\0';
-	char *value = kcalloc(end - pair_delim, sizeof(char), GFP_KERNEL);
-	j = 0;
-	for (i = pair_delim + 1; i < end; i++) {
-		value[j++] = buffer[i];
+
+	name_len = pair_delim - name_start;
+	value_len = end - pair_delim - 1;
+	p->name = kcalloc(name_len + 1, sizeof(char), GFP_KERNEL);
+	p->value = kcalloc(value_len + 1, sizeof(char), GFP_KERNEL);
+	if (!p->name || !p->value) {
+		kfree(p->name);
+		kfree(p->value);
+		kfree(p);
+		return NULL;
 	}
-	value[j] = '\0';
-	avp *p = kcalloc(1, sizeof(avp), GFP_KERNEL);
-	p->name = name;
-	p->value = value;
-	p->next = NULL;
+
+	memcpy(p->name, buffer + name_start, name_len);
+	memcpy(p->value, buffer + pair_delim + 1, value_len);
+	p->name[name_len] = '\0';
+	p->value[value_len] = '\0';
 	return p;
 }
 

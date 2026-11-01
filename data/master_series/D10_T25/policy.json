@@ -1,0 +1,184 @@
+{
+  "rules": [
+    {
+      "user": {
+        "SA_1": "SA_1_9",
+        "SA_2": "SA_2_9",
+        "SA_3": "SA_3_5"
+      },
+      "obj": {
+        "OA_1": "OA_1_5",
+        "OA_2": "OA_2_2",
+        "OA_3": "OA_3_4"
+      },
+      "env": {
+        "tee:day": "weekday",
+        "tee:time": "working_hours"
+      },
+      "op": "READ",
+      "effect": "ALLOW"
+    },
+    {
+      "user": {
+        "SA_1": "SA_1_9",
+        "SA_2": "SA_2_9",
+        "SA_3": "SA_3_5"
+      },
+      "obj": {
+        "OA_1": "OA_1_3",
+        "OA_2": "OA_2_5",
+        "OA_3": "OA_3_8"
+      },
+      "env": {
+        "tee:day": "weekday",
+        "tee:time": "working_hours"
+      },
+      "op": "READ",
+      "effect": "ALLOW"
+    },
+    {
+      "user": {
+        "SA_1": "SA_1_5",
+        "SA_2": "SA_2_1",
+        "SA_3": "SA_3_2"
+      },
+      "obj": {
+        "OA_1": "OA_1_2",
+        "OA_2": "OA_2_9",
+        "OA_3": "OA_3_3"
+      },
+      "env": {
+        "tee:day": "weekday",
+        "tee:time": "working_hours"
+      },
+      "op": "READ",
+      "effect": "ALLOW"
+    },
+    {
+      "user": {
+        "SA_1": "SA_1_8",
+        "SA_2": "SA_2_1",
+        "SA_3": "SA_3_10"
+      },
+      "obj": {
+        "OA_1": "OA_1_10",
+        "OA_2": "OA_2_4",
+        "OA_3": "OA_3_4"
+      },
+      "env": {
+        "tee:day": "weekday",
+        "tee:time": "working_hours"
+      },
+      "op": "READ",
+      "effect": "ALLOW"
+    },
+    {
+      "user": {
+        "SA_1": "SA_1_9",
+        "SA_2": "SA_2_1",
+        "SA_3": "SA_3_9"
+      },
+      "obj": {
+        "OA_1": "OA_1_8",
+        "OA_2": "OA_2_9",
+        "OA_3": "OA_3_6"
+      },
+      "env": {
+        "tee:day": "weekday",
+        "tee:time": "working_hours"
+      },
+      "op": "READ",
+      "effect": "ALLOW"
+    },
+    {
+      "user": {
+        "SA_1": "SA_1_9",
+        "SA_2": "SA_2_1",
+        "SA_3": "SA_3_9"
+      },
+      "obj": {
+        "OA_1": "OA_1_10",
+        "OA_2": "OA_2_4",
+        "OA_3": "OA_3_4"
+      },
+      "env": {
+        "tee:day": "weekday",
+        "tee:time": "working_hours"
+      },
+      "op": "READ",
+      "effect": "ALLOW"
+    },
+    {
+      "user": {
+        "SA_1": "SA_1_5",
+        "SA_2": "SA_2_1",
+        "SA_3": "SA_3_2"
+      },
+      "obj": {
+        "OA_1": "OA_1_2",
+        "OA_2": "OA_2_8",
+        "OA_3": "OA_3_5"
+      },
+      "env": {
+        "tee:day": "weekday",
+        "tee:time": "working_hours"
+      },
+      "op": "READ",
+      "effect": "ALLOW"
+    },
+    {
+      "user": {
+        "SA_1": "SA_1_8",
+        "SA_2": "SA_2_1",
+        "SA_3": "SA_3_7"
+      },
+      "obj": {
+        "OA_1": "OA_1_8",
+        "OA_2": "OA_2_9",
+        "OA_3": "OA_3_6"
+      },
+      "env": {
+        "tee:day": "weekday",
+        "tee:time": "working_hours"
+      },
+      "op": "READ",
+      "effect": "ALLOW"
+    },
+    {
+      "user": {
+        "SA_1": "SA_1_9",
+        "SA_2": "SA_2_9",
+        "SA_3": "SA_3_5"
+      },
+      "obj": {
+        "OA_1": "OA_1_8",
+        "OA_2": "OA_2_9",
+        "OA_3": "OA_3_6"
+      },
+      "env": {
+        "tee:day": "weekday",
+        "tee:time": "working_hours"
+      },
+      "op": "READ",
+      "effect": "DENY"
+    },
+    {
+      "user": {
+        "SA_1": "SA_1_9",
+        "SA_2": "SA_2_9",
+        "SA_3": "SA_3_5"
+      },
+      "obj": {
+        "OA_1": "OA_1_6",
+        "OA_2": "OA_2_3",
+        "OA_3": "OA_3_2"
+      },
+      "env": {
+        "tee:day": "weekday",
+        "tee:time": "working_hours"
+      },
+      "op": "READ",
+      "effect": "DENY"
+    }
+  ]
+}

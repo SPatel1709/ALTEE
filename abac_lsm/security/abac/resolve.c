@@ -9,6 +9,7 @@
 #include "user.h"
 #include "obj.h"
 #include "abacfs.h"
+#include "tee_bridge.h"
 #include <linux/hashtable.h>
 #include <linux/jhash.h>
 #include <linux/string.h>
@@ -33,13 +34,15 @@ void abac_destroy_lookup_maps(void)
 
 	while (u_cursor != NULL) {
 		if (!hlist_unhashed(&u_cursor->hnode))
-			hlist_del_init(&u_cursor->hnode);
+				hlist_del_init(&u_cursor->hnode);
+
 		u_cursor = u_cursor->next;
 	}
 
 	while (o_cursor != NULL) {
 		if (!hlist_unhashed(&o_cursor->hnode))
-			hlist_del_init(&o_cursor->hnode);
+				hlist_del_init(&o_cursor->hnode);
+
 		o_cursor = o_cursor->next;
 	}
 }
@@ -61,8 +64,7 @@ void abac_rebuild_lookup_maps(void)
 
 	while (o_cursor != NULL) {
 		INIT_HLIST_NODE(&o_cursor->hnode);
-		hash_add(abac_obj_map, &o_cursor->hnode,
-			 abac_obj_key(o_cursor->path));
+		hash_add(abac_obj_map, &o_cursor->hnode,abac_obj_key(o_cursor->path));
 		o_cursor = o_cursor->next;
 	}
 }
@@ -77,8 +79,7 @@ static bool avp_contains(avp *required, avp *actual)
 		a_cursor = actual;
 		match_found = false;
 		while (a_cursor != NULL) {
-			if (strcmp(r_cursor->name, a_cursor->name) == 0 &&
-			    strcmp(r_cursor->value, a_cursor->value) == 0) {
+			if (strcmp(r_cursor->name, a_cursor->name) == 0 && strcmp(r_cursor->value, a_cursor->value) == 0) {
 				match_found = true;
 				break;
 			}
@@ -91,17 +92,63 @@ static bool avp_contains(avp *required, avp *actual)
 	return true;
 }
 
-static bool op_matches(enum abac_op rule_op, enum abac_op access_op,
-		       enum abac_effect effect)
+
+static bool tee_section_matches(avp *required, avp *actual,abac_tee_u32 attribute_type,abac_tee_rule_data_t *request)
+{
+        avp *required_cursor;
+        avp *actual_cursor;
+        abac_tee_attribute_t *tee_attribute;
+        bool matched;
+
+        required_cursor = required;
+        while (required_cursor) {
+                matched = false;
+                actual_cursor = actual;
+
+                while (actual_cursor) {
+                        if (strcmp(required_cursor->name,actual_cursor->name) == 0 &&
+                            (required_cursor->tee_protected || strcmp(required_cursor->value,actual_cursor->value) == 0)) {
+                                matched = true;
+                                break;
+                        }
+                        actual_cursor = actual_cursor->next;
+                }
+
+                if (!matched)
+                        return false;
+
+                if (required_cursor->tee_protected) {
+                        if (request->attribute_count >= ABAC_TEE_MAX_ATTRIBUTES)
+                                return false;
+
+                        tee_attribute =&request->attributes[request->attribute_count];
+
+                        tee_attribute->type = attribute_type;
+                        if (strscpy(tee_attribute->name,required_cursor->name,sizeof(tee_attribute->name)) < 0)
+                                return false;
+                        if (strscpy(tee_attribute->value,actual_cursor->value,sizeof(tee_attribute->value)) < 0)
+                                return false;
+
+                        request->attribute_count++;
+                }
+
+                required_cursor = required_cursor->next;
+        }
+
+        return true;
+}
+
+static bool op_matches(enum abac_op rule_op, enum abac_op access_op,enum abac_effect effect)
 {
 	if (rule_op == access_op)
 		return true;
-	if (effect == ABAC_ALLOW && rule_op == ABAC_MODIFY &&
-	    access_op == ABAC_READ)
+	if (effect == ABAC_ALLOW && rule_op == ABAC_MODIFY && access_op == ABAC_READ)
 		return true;
 	return false;
 }
 
+
+// Returns attributes assigned to a User.
 static avp *get_user_avp(unsigned int UID, abac_user *head)
 {
 	abac_user *hashed;
@@ -115,6 +162,7 @@ static avp *get_user_avp(unsigned int UID, abac_user *head)
 		return NULL;
 	}
 
+	// We are deliberately checking all the Buckets is User not found in it's Bucket.
 	while (cursor != NULL) {
 		if (cursor->uid == UID) {
 			return cursor->attrs;
@@ -124,6 +172,7 @@ static avp *get_user_avp(unsigned int UID, abac_user *head)
 	return NULL;
 }
 
+// Returns attributes assigned to File/Folder.
 static avp *get_obj_avp(char *path, abac_obj *head)
 {
 	abac_obj *hashed;
@@ -259,58 +308,82 @@ static avp *get_inherited_obj_avp(char *path, abac_obj *head)
 
 bool abac_resolve_linear(unsigned int UID, char *path, int mask)
 {
-	enum abac_op op = convert_to_abac_op(mask);
-	avp *uattr;
-	avp *oattr;
-	abac_rule *rule;
-	bool allow_found = false;
+        enum abac_op op = convert_to_abac_op(mask);
+        abac_tee_rule_data_t *tee_request = NULL;
+        avp *uattr;
+        avp *oattr;
+        abac_rule *rule;
+        bool attributes_match;
+        bool allow_found = false;
 
-	if (op == ABAC_IGNORE)
-		return true;
+        if (op == ABAC_IGNORE)
+                return true;
 
-	uattr = get_user_avp(UID, user_attr);
-	if (!uattr)
-		return false;
+        uattr = get_user_avp(UID, user_attr);
+        if (!uattr)
+                return false;
 
-	oattr = get_inherited_obj_avp(path, obj_attr);
-	if (!oattr) {
-		/* A protected but unlabelled object fails closed. */
-            return false;
-	}
+        oattr = get_inherited_obj_avp(path, obj_attr);
+        if (!oattr)
+                return false;
 
-	if (!policy)
-		goto deny;
+        if (!policy)
+                goto deny;
 
-	rule = policy->rules;
-	while (rule != NULL) {
-		if (!avp_contains(rule->object, oattr)) {
-			rule = rule->next;
-			continue;
-		}
-		if (!avp_contains(rule->user, uattr)) {
-			rule = rule->next;
-			continue;
-		}
-		if (rule->env && (!env_attr || !avp_contains(rule->env, env_attr))) {
-			rule = rule->next;
-			continue;
-		}
-		if (!op_matches(rule->op, op, rule->effect)) {
-			rule = rule->next;
-			continue;
-		}
-		if (rule->effect == ABAC_DENY)
-			goto deny;
-		allow_found = true;
-		rule = rule->next;
-	}
+        if (abac_tee_mode == ABAC_TEE_ON) {
+                tee_request = kzalloc(sizeof(*tee_request), GFP_KERNEL);
+                if (!tee_request)
+                        goto deny;
+        }
 
-	destroy_avp_list(oattr);
-	return allow_found;
+        rule = policy->rules;
+        while (rule) {
+                if (!op_matches(rule->op, op, rule->effect)) {
+                        rule = rule->next;
+                        continue;
+                }
+
+                if (abac_tee_mode == ABAC_TEE_ON) {
+                        memset(tee_request, 0, sizeof(*tee_request));
+                        tee_request->rule_id = rule->id;
+
+                        attributes_match = tee_section_matches(rule->object, oattr,ABAC_TEE_OBJECT_ATTRIBUTE,tee_request)
+										&& tee_section_matches(rule->user, uattr,ABAC_TEE_USER_ATTRIBUTE,tee_request)
+										&& tee_section_matches(rule->env, env_attr,ABAC_TEE_ENV_ATTRIBUTE,tee_request);
+
+                        if (!attributes_match) {
+                                rule = rule->next;
+                                continue;
+                        }
+
+                        if (tee_request->attribute_count > 0 &&
+                            !abac_tee_evaluate_rule(tee_request)) {
+                                rule = rule->next;
+                                continue;
+                        }
+                } else {
+                        if (!avp_contains(rule->object, oattr) || !avp_contains(rule->user, uattr) ||
+								(rule->env && (!env_attr || !avp_contains(rule->env, env_attr)))) {
+                                rule = rule->next;
+                                continue;
+                        }
+                }
+
+                if (rule->effect == ABAC_DENY)
+                        goto deny;
+
+                allow_found = true;
+                rule = rule->next;
+        }
+
+        kfree(tee_request);
+        destroy_avp_list(oattr);
+        return allow_found;
 
 deny:
-	destroy_avp_list(oattr);
-	return false;
+        kfree(tee_request);
+        destroy_avp_list(oattr);
+        return false;
 }
 
 bool abac_resolve_tree(unsigned int UID, char *path, int mask)

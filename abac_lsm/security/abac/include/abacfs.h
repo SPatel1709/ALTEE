@@ -26,6 +26,7 @@ extern abac_obj *obj_attr;
 extern avp *env_attr;
 
 enum abac_resolve_mode { ABAC_RESOLVE_LINEAR, ABAC_RESOLVE_TREE };
+enum abac_tee_mode { ABAC_TEE_OFF, ABAC_TEE_ON };
 
 struct abac_perf_stats {
 	u64 total_time_ns;
@@ -43,6 +44,7 @@ struct abac_path_entry {
 };
 
 extern enum abac_resolve_mode abac_mode;
+extern enum abac_tee_mode abac_tee_mode;
 extern bool abac_use_hashmap;
 extern int abac_recording;
 extern struct abac_perf_stats abac_stats;

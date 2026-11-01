@@ -1,0 +1,27 @@
+{
+  "subject_size": 200,
+  "object_size": 200,
+  "environment_size": 1,
+  "permit_rules_count": 819,
+  "deny_rules_count": 205,
+  "subject_attributes_count": 3,
+  "object_attributes_count": 3,
+  "environment_attributes_count": 2,
+  "subject_attributes_values": [10, 10, 10],
+  "object_attributes_values": [10, 10, 10],
+  "environment_attributes_values": [1, 1],
+  "subject_distributions": [
+    {"distribution": "U"},
+    {"distribution": "U"},
+    {"distribution": "U"}
+  ],
+  "object_distributions": [
+    {"distribution": "U"},
+    {"distribution": "U"},
+    {"distribution": "U"}
+  ],
+  "environment_distributions": [
+    {"distribution": "U"},
+    {"distribution": "U"}
+  ]
+}

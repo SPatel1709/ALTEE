@@ -1,0 +1,2 @@
+label,samples,allows,denies,mean_ns,p50_ns,p95_ns,p99_ns,ops_per_sec
+D500_T25_run3,1000,500,500,60148.0,54759,99957,130211,16615.8

@@ -1,0 +1,72 @@
+{
+  "assumption": "weekday, working hours, READ, ABAC scope",
+  "decisions": [
+    {
+      "subject": "S_2",
+      "object": "O_1",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_2",
+      "object": "O_2",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_2",
+      "object": "O_3",
+      "expected": "ALLOW",
+      "matching_rule_ids": [
+        1,
+        8
+      ]
+    },
+    {
+      "subject": "S_2",
+      "object": "O_4",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_2",
+      "object": "O_5",
+      "expected": "DENY",
+      "matching_rule_ids": [
+        10
+      ]
+    },
+    {
+      "subject": "S_2",
+      "object": "O_6",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_2",
+      "object": "O_7",
+      "expected": "DENY",
+      "matching_rule_ids": [
+        9
+      ]
+    },
+    {
+      "subject": "S_2",
+      "object": "O_8",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_2",
+      "object": "O_9",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_2",
+      "object": "O_10",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    }
+  ]
+}

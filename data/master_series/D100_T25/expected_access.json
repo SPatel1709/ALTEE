@@ -1,0 +1,1217 @@
+{
+  "assumption": "weekday, working hours, READ, ABAC scope",
+  "decisions": [
+    {
+      "subject": "S_83",
+      "object": "O_1",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_2",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_3",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_4",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_5",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_6",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_7",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_8",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_9",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_10",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_11",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_12",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_13",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_14",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_15",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_16",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_17",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_18",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_19",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_20",
+      "expected": "ALLOW",
+      "matching_rule_ids": [
+        2
+      ]
+    },
+    {
+      "subject": "S_83",
+      "object": "O_21",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_22",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_23",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_24",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_25",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_26",
+      "expected": "DENY",
+      "matching_rule_ids": [
+        82
+      ]
+    },
+    {
+      "subject": "S_83",
+      "object": "O_27",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_28",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_29",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_30",
+      "expected": "DENY",
+      "matching_rule_ids": [
+        82
+      ]
+    },
+    {
+      "subject": "S_83",
+      "object": "O_31",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_32",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_33",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_34",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_35",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_36",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_37",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_38",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_39",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_40",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_41",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_42",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_43",
+      "expected": "DENY",
+      "matching_rule_ids": [
+        81
+      ]
+    },
+    {
+      "subject": "S_83",
+      "object": "O_44",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_45",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_46",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_47",
+      "expected": "ALLOW",
+      "matching_rule_ids": [
+        1
+      ]
+    },
+    {
+      "subject": "S_83",
+      "object": "O_48",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_49",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_50",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_51",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_52",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_53",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_54",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_55",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_56",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_57",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_58",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_59",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_60",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_61",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_62",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_63",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_64",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_65",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_66",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_67",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_68",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_69",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_70",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_71",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_72",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_73",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_74",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_75",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_76",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_77",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_78",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_79",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_80",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_81",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_82",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_83",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_84",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_85",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_86",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_87",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_88",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_89",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_90",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_91",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_92",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_93",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_94",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_95",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_96",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_97",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_98",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_99",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_100",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_101",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_102",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_103",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_104",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_105",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_106",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_107",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_108",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_109",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_110",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_111",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_112",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_113",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_114",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_115",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_116",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_117",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_118",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_119",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_120",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_121",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_122",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_123",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_124",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_125",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_126",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_127",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_128",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_129",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_130",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_131",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_132",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_133",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_134",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_135",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_136",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_137",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_138",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_139",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_140",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_141",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_142",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_143",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_144",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_145",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_146",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_147",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_148",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_149",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_150",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_151",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_152",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_153",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_154",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_155",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_156",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_157",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_158",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_159",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_160",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_161",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_162",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_163",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_164",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_165",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_166",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_167",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_168",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_169",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_170",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_171",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_172",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_173",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_174",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_175",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_176",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_177",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_178",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_179",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_180",
+      "expected": "DENY",
+      "matching_rule_ids": [
+        81
+      ]
+    },
+    {
+      "subject": "S_83",
+      "object": "O_181",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_182",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_183",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_184",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_185",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_186",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_187",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_188",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_189",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_190",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_191",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_192",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_193",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_194",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_195",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_196",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_197",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_198",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_199",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    },
+    {
+      "subject": "S_83",
+      "object": "O_200",
+      "expected": "DENY",
+      "matching_rule_ids": []
+    }
+  ]
+}

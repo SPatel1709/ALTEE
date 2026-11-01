@@ -1,0 +1,6 @@
+{
+  "env": {
+    "day": "weekday",
+    "time": "working_hours"
+  }
+}

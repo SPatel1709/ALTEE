@@ -3,6 +3,9 @@
 	Copyright (C) <2021>  Hariyala Omkara Naga Sai Varshith
 */
 
+
+// object is the file/folder that the user wants to access.
+
 #ifndef _ABAC_OBJ_H
 #define _ABAC_OBJ_H
 

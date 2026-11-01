@@ -1,0 +1,54 @@
+{
+  "objects": {
+    "/home/secured/musima/O_1.txt": {
+      "OA_1": "OA_1_1",
+      "OA_2": "OA_2_3",
+      "OA_3": "OA_3_1"
+    },
+    "/home/secured/musima/O_2.txt": {
+      "OA_1": "OA_1_2",
+      "OA_2": "OA_2_3",
+      "OA_3": "OA_3_2"
+    },
+    "/home/secured/musima/O_3.txt": {
+      "OA_1": "OA_1_1",
+      "OA_2": "OA_2_2",
+      "OA_3": "OA_3_2"
+    },
+    "/home/secured/musima/O_4.txt": {
+      "OA_1": "OA_1_1",
+      "OA_2": "OA_2_3",
+      "OA_3": "OA_3_3"
+    },
+    "/home/secured/musima/O_5.txt": {
+      "OA_1": "OA_1_3",
+      "OA_2": "OA_2_2",
+      "OA_3": "OA_3_1"
+    },
+    "/home/secured/musima/O_6.txt": {
+      "OA_1": "OA_1_1",
+      "OA_2": "OA_2_3",
+      "OA_3": "OA_3_3"
+    },
+    "/home/secured/musima/O_7.txt": {
+      "OA_1": "OA_1_3",
+      "OA_2": "OA_2_1",
+      "OA_3": "OA_3_1"
+    },
+    "/home/secured/musima/O_8.txt": {
+      "OA_1": "OA_1_3",
+      "OA_2": "OA_2_2",
+      "OA_3": "OA_3_3"
+    },
+    "/home/secured/musima/O_9.txt": {
+      "OA_1": "OA_1_1",
+      "OA_2": "OA_2_2",
+      "OA_3": "OA_3_1"
+    },
+    "/home/secured/musima/O_10.txt": {
+      "OA_1": "OA_1_1",
+      "OA_2": "OA_2_1",
+      "OA_3": "OA_3_3"
+    }
+  }
+}
